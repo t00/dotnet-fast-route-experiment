@@ -4,7 +4,8 @@ Experimentation of a route lookup dictionary with character grouping
 A test runs 5 million times a route lookup on a dictionary with 24 elements.
 
 The baseline is a hash test which only works if the route is an exact match (url needs to be already split into segments):
-MeasureActionRoute for HashDictionaryRouter with suffix ''
+
+##### MeasureActionRoute for HashDictionaryRouter with suffix ''
 - animations1animations: 214
 - categories1categories: 276
 - categorytree1categorytree: 225
@@ -33,16 +34,17 @@ MeasureActionRoute for HashDictionaryRouter with suffix ''
 
 If all calls are mixed together, Modulo contains the overall average results for all routes tested (24 exact and 1 not found)
 
-MeasureActionRouteModulo for HashDictionaryRouter
+##### MeasureActionRouteModulo for HashDictionaryRouter
 - total: 252
 
 Fist lookup implementation is using Dictionary<char, ActionDictionary> to process consecutive characters and check the match.
 This is considerably slower than a quick hash match.
 
 Not using lookup
-MeasureActionRouteModulo for ActionDictionaryRouter
+##### MeasureActionRouteModulo for ActionDictionaryRouter
 - total: 794
-MeasureActionRoute for ActionDictionaryRouter with suffix ''
+
+##### MeasureActionRoute for ActionDictionaryRouter with suffix ''
 - animations1animations: 555
 - categories1categories: 794
 - categorytree1categorytree: 784
@@ -70,7 +72,7 @@ MeasureActionRoute for ActionDictionaryRouter with suffix ''
 - notfound: 29
 
 As ActionDictionary router does not need exact matching, a suffix can be added to test urls which should not affect results (and it mostly does not):
-MeasureActionRoute for ActionDictionaryRouter with suffix '?test'
+##### MeasureActionRoute for ActionDictionaryRouter with suffix '?test'
 - animations1animations: 562
 - categories1categories: 787
 - categorytree1categorytree: 797
@@ -97,12 +99,14 @@ MeasureActionRoute for ActionDictionaryRouter with suffix '?test'
 - xmlstructure2xmlstructure: 797
 - notfound: 164
 
-Alternative implementation is using a lookup character array which will store 256 method references for each character allowing instant access - O(1).
+Alternative implementation is to use a lookup character array which will store 256 method references for each character allowing instant access - O(1).
+For characters other than ASCII, the lookup will revert to the unicode dictionary character lookup.
 
 Using lookup
-MeasureActionRouteModulo for ActionDictionaryRouter
+##### MeasureActionRouteModulo for ActionDictionaryRouter
 - total: 598
-MeasureActionRoute for ActionDictionaryRouter with suffix ''
+
+##### MeasureActionRoute for ActionDictionaryRouter with suffix ''
 - animations1animations: 431
 - categories1categories: 600
 - categorytree1categorytree: 615
@@ -128,7 +132,8 @@ MeasureActionRoute for ActionDictionaryRouter with suffix ''
 - xmlproperties2xmlproperties: 612
 - xmlstructure2xmlstructure: 609
 - notfound: 31
-MeasureActionRoute for ActionDictionaryRouter with suffix '?test'
+
+##### MeasureActionRoute for ActionDictionaryRouter with suffix '?test'
 - animations1animations: 433
 - categories1categories: 601
 - categorytree1categorytree: 609
@@ -155,8 +160,10 @@ MeasureActionRoute for ActionDictionaryRouter with suffix '?test'
 - xmlstructure2xmlstructure: 614
 - notfound: 106
 
-Unfortunately results are not satisfying since there is a need for a lot of calls to be made to framework functions including string char indexer:
+Unfortunately results are not satisfying since there is a need for more calls to be made to the framework 
+functions TryGetValue and IndexOf and as of now I can't see any point of improvement:
 
+```
             var c = status.Text[status.Index];
 0DA0  push        rdi  
 0DA1  push        rsi  
@@ -265,6 +272,7 @@ Unfortunately results are not satisfying since there is a need for a lot of call
 0EBE  ret  
 0EBF  call        00007FFFDD3064D0  
 0EC4  int         3  
+```
 
 This leads to the conclusion - it is more optimal to split the address
 by known separatos (/, ?, ;) and do lookups using the standard dictionary object
