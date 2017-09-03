@@ -37,7 +37,7 @@
                     router.Route(action);
                 }
                 watch.Stop();
-                System.Diagnostics.Trace.WriteLine($"# {testAction.route}: {watch.ElapsedMilliseconds}");
+                System.Diagnostics.Trace.WriteLine($"- {testAction.route}: {watch.ElapsedMilliseconds}");
             }
         }
 
@@ -55,7 +55,7 @@
                 router.Route(action);
             }
             watch.Stop();
-            System.Diagnostics.Trace.WriteLine($"# total: {watch.ElapsedMilliseconds}");
+            System.Diagnostics.Trace.WriteLine($"- total: {watch.ElapsedMilliseconds}");
         }
     }
 }
